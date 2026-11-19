@@ -1,0 +1,9 @@
+global using Microsoft.AspNetCore.Http.HttpResults;
+global using Microsoft.EntityFrameworkCore;
+global using RoomHub.Api.Common;
+global using RoomHub.Api.Common.Cqrs;
+global using RoomHub.Api.Domain.Common;
+global using RoomHub.Api.Domain.Rooms;
+global using RoomHub.Api.Domain.Bookings;
+global using RoomHub.Api.Infrastructure.Persistence;
+global using RoomHub.Api.Infrastructure.Persistence.Repositories;
