@@ -1,9 +1,9 @@
 # BUGS
 
-| Regulă | Unde era în starter | Cum am găsit-o | Ce am schimbat |
+| Rule | Where in the starter | How I found it | What I changed |
 |---|---|---|---|
-| R7 | `BookingService.Create`, în `foreach` | Am comparat codul cu cerința. Folosea `<=` la intervale, deci două rezervări lipite (ex: 10-12 și 12-14) dădeau conflict | Am pus `<` strict în `Booking.Overlaps` (`StartUtc < endUtc && startUtc < EndUtc`) |
-| R7 / R8 | `BookingService.Create` | Verifica toate rezervările din sală, chiar și pe cele anulate | Verific doar rezervările active (`ListActiveForRoomAsync` și `IsActive`) |
-| R8 | `BookingService.Cancel` | Punea direct statusul `Cancelled` fără să vadă dacă era deja anulată | Am adăugat check în `Booking.Cancel` să dea `AlreadyCancelled` (409) |
-| R5 | `BookingService.Create` | Lipsea verificarea pentru rezervări în trecut și folosea direct `DateTime.UtcNow` | Am pus check-ul în `Booking.Create` și am injectat `TimeProvider` în handler |
-| R6 | `BookingService.Create` | Nu verifica durata maximă | Am pus limita de maxim 4 ore în `Booking.Create` (fix 4 ore merge) |
+| R7 | `BookingService.Create`, inside the `foreach` loop | Compared the starter code with the rules. It used `<=` for intervals, so touching bookings (like 10-12 and 12-14) gave a conflict | Changed `Booking.Overlaps` to use strict `<` (`StartUtc < endUtc && startUtc < EndUtc`) |
+| R7 / R8 | `BookingService.Create` | It checked all bookings in the room, even cancelled ones | Filtered to only active bookings (`ListActiveForRoomAsync` and `IsActive`) |
+| R8 | `BookingService.Cancel` | It just set `Cancelled` without checking if it was already cancelled | Added a check in `Booking.Cancel` to return `AlreadyCancelled` (409) |
+| R5 | `BookingService.Create` | Past booking check was missing and it used `DateTime.UtcNow` directly | Added the past check in `Booking.Create` and injected `TimeProvider` in the handler |
+| R6 | `BookingService.Create` | Max duration check was missing | Added the 4-hour max limit in `Booking.Create` (4h exact works) |
