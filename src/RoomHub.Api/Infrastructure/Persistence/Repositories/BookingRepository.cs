@@ -10,5 +10,10 @@ public sealed class BookingRepository(RoomHubDbContext db) : IBookingRepository
             .Where(b => b.RoomId == roomId && b.Status == BookingStatus.Active)
             .ToListAsync(cancellationToken);
 
+    public Task<List<Booking>> ListActiveForParticipantAsync(string bookedBy, CancellationToken cancellationToken) =>
+        db.Bookings
+            .Where(b => b.BookedBy == bookedBy && b.Status == BookingStatus.Active)
+            .ToListAsync(cancellationToken);
+
     public void Add(Booking booking) => db.Bookings.Add(booking);
 }

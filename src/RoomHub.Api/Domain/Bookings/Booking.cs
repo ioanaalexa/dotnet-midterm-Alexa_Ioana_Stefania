@@ -3,6 +3,7 @@ namespace RoomHub.Api.Domain.Bookings;
 public sealed class Booking
 {
     public static readonly TimeSpan MaxDuration = TimeSpan.FromHours(4);
+    public const int MaxActiveBookingsPerDay = 2;
 
     private Booking() { }   // for EF Core
 
@@ -16,7 +17,7 @@ public sealed class Booking
 
     public bool IsActive => Status == BookingStatus.Active;
 
-    // Order: bookedBy -> range -> attendees -> past -> duration -> overlap.
+    // Order: bookedBy -> range -> attendees -> past -> duration -> overlap -> daily limit.
     // The room (404) is checked BEFORE this, in the handler.
     public static Result<Booking> Create(
         Room room,
@@ -25,7 +26,8 @@ public sealed class Booking
         DateTime endUtc,
         int attendees,
         DateTime nowUtc,
-        IEnumerable<Booking> roomBookings)
+        IEnumerable<Booking> roomBookings,
+        IEnumerable<Booking> participantBookings)
     {
         if (string.IsNullOrWhiteSpace(bookedBy))
             return BookingErrors.BookedByRequired;                    // R2
@@ -49,6 +51,12 @@ public sealed class Booking
 
         if (roomBookings.Any(b => b.IsActive && b.Overlaps(start, end)))
             return BookingErrors.RoomOccupied;                        // R7
+
+        var sameDayCount = participantBookings.Count(b =>
+            b.IsActive && b.StartUtc.Date == start.Date);
+
+        if (sameDayCount >= MaxActiveBookingsPerDay)
+            return BookingErrors.DailyLimitExceeded;                  // R9
 
         return new Booking
         {

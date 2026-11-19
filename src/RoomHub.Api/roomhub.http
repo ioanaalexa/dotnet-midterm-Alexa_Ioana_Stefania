@@ -1,0 +1,28 @@
+
+### R10-1. Create large room (capacity 11)
+# @name createLargeRoom
+POST {{baseUrl}}/api/rooms
+Content-Type: application/json
+
+{ "name": "Large room", "capacity": 11 }
+
+###
+@largeRoomId = {{createLargeRoom.response.body.$.id}}
+
+### R10-2. Large room, exactly 2 hours (expected 201)
+POST {{baseUrl}}/api/rooms/{{largeRoomId}}/bookings
+Content-Type: application/json
+
+{ "bookedBy": "dan", "startUtc": "2030-04-01T08:00:00Z", "endUtc": "2030-04-01T10:00:00Z", "attendees": 5 }
+
+### R10-3. Large room, 2h01 (expected 400)
+POST {{baseUrl}}/api/rooms/{{largeRoomId}}/bookings
+Content-Type: application/json
+
+{ "bookedBy": "dan", "startUtc": "2030-04-02T08:00:00Z", "endUtc": "2030-04-02T10:01:00Z", "attendees": 5 }
+
+### R10-4. Normal room (capacity 10), exactly 4 hours (expected 201)
+POST {{baseUrl}}/api/rooms/{{roomId}}/bookings
+Content-Type: application/json
+
+{ "bookedBy": "elena", "startUtc": "2030-04-03T08:00:00Z", "endUtc": "2030-04-03T12:00:00Z", "attendees": 5 }
